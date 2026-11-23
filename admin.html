@@ -1,0 +1,1640 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin - Indiani Way</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        background: #fdf6f0;
+        padding: 20px 5%;
+        color: #3d1f10;
+      }
+      .card {
+        background: #fff;
+        padding: 20px;
+        border: 1px solid #ddd;
+        margin-bottom: 20px;
+        border-radius: 6px;
+      }
+      input,
+      textarea,
+      select {
+        width: 100%;
+        padding: 10px;
+        margin: 6px 0;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+        font-family: inherit;
+      }
+      .grid {
+        grid-template-columns: 1fr 1fr;
+        display: grid;
+        gap: 10px;
+      }
+      .checkbox-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin: 10px 0;
+      }
+      .checkbox-row input {
+        width: auto;
+        margin: 0;
+      }
+      .btn {
+        background: #3d1f10;
+        color: #fff;
+        padding: 10px 18px;
+        border: none;
+        cursor: pointer;
+        border-radius: 4px;
+        font-weight: bold;
+        min-height: 40px;
+      }
+      .btn.secondary {
+        background: transparent;
+        color: #3d1f10;
+        border: 1px solid #3d1f10;
+        margin-left: 8px;
+        font-weight: normal;
+      }
+      .btn.danger {
+        background: #9b1c1c;
+        color: #fff;
+        border: none;
+      }
+      .btn.danger:hover {
+        background: #7a1414;
+      }
+      .p-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 12px;
+      }
+      .p-card {
+        border: 1px solid #ddd;
+        padding: 10px;
+        background: #fff;
+        border-radius: 4px;
+        word-break: break-word;
+      }
+      .p-card img {
+        width: 100%;
+        height: 160px;
+        object-fit: cover;
+        border-radius: 4px;
+      }
+      .featured-badge {
+        display: inline-block;
+        background: #9b1c1c;
+        color: #fff;
+        font-size: 10px;
+        padding: 2px 8px;
+        border-radius: 10px;
+        margin-left: 6px;
+      }
+      .p-card-actions {
+        margin-top: 8px;
+        display: flex;
+        gap: 6px;
+      }
+      .p-card-actions button {
+        flex: 1;
+        padding: 6px;
+        font-size: 11px;
+        border: 1px solid #3d1f10;
+        background: transparent;
+        cursor: pointer;
+        border-radius: 4px;
+        min-height: 36px;
+      }
+      .auth-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 12px;
+      }
+           /* TAB NAVIGATION */
+      .admin-nav-tabs {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+        border-bottom: 2px solid #eae0d8;
+        padding-bottom: 10px;
+        overflow-x: auto;
+        flex-wrap: wrap;
+      }
+      .tab-btn {
+        background: transparent;
+        color: #3d1f10;
+        border: 1px solid #3d1f10;
+        padding: 10px 22px;
+        border-radius: 4px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: 0.2s;
+        white-space: nowrap;
+      }
+      .tab-btn.active {
+        background: #3d1f10;
+        color: #fff;
+      }
+      .tab-btn .badge {
+        background: #9b1c1c;
+        color: #fff;
+        font-size: 11px;
+        padding: 2px 7px;
+        border-radius: 10px;
+        margin-left: 6px;
+      }
+      .tab-btn.active .badge {
+        background: #fff;
+        color: #3d1f10;
+      }
+
+      /* ORDERS MANAGEMENT STYLES */
+      .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+        gap: 10px;
+        margin-bottom: 20px;
+      }
+      .summary-card {
+        background: #fff;
+        border: 1px solid #ddd;
+        padding: 14px 10px;
+        border-radius: 6px;
+        text-align: center;
+      }
+      .summary-num {
+        font-size: 22px;
+        font-weight: bold;
+        color: #3d1f10;
+      }
+      .summary-label {
+        font-size: 10px;
+        color: #8b6a5a;
+        text-transform: uppercase;
+        margin-top: 4px;
+        letter-spacing: 0.5px;
+      }
+
+      .controls-bar {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+      .controls-bar input {
+        flex: 2;
+        min-width: 220px;
+        margin: 0;
+      }
+      .controls-bar select {
+        flex: 1;
+        min-width: 150px;
+        margin: 0;
+      }
+
+      .o-card {
+        border: 1px solid #ddd;
+        padding: 16px;
+        background: #fff;
+        border-radius: 6px;
+        margin-bottom: 14px;
+        transition: 0.2s;
+        word-break: break-word;
+      }
+      .o-card:hover {
+        border-color: #3d1f10;
+        box-shadow: 0 4px 12px rgba(61, 31, 16, 0.05);
+      }
+      .o-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 10px;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 8px;
+      }
+      .o-id {
+        font-size: 16px;
+        font-weight: bold;
+        color: #3d1f10;
+        word-break: break-all;
+      }
+      .o-date {
+        font-size: 12px;
+        color: #8b6a5a;
+      }
+
+      .o-status-badge {
+        display: inline-block;
+        padding: 3px 10px;
+        border-radius: 12px;
+        font-size: 11px;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+      .status-Pending {
+        background: #fff3e0;
+        color: #e65100;
+      }
+      .status-New {
+        background: #fff3e0;
+        color: #e65100;
+      }
+      .status-Confirmed {
+        background: #e3f2fd;
+        color: #0d47a1;
+      }
+      .status-Contacted {
+        background: #e3f2fd;
+        color: #0d47a1;
+      }
+      .status-Processing {
+        background: #f3e5f5;
+        color: #4a148c;
+      }
+      .status-Shipped {
+        background: #e8eaf6;
+        color: #1a237e;
+      }
+      .status-Delivered {
+        background: #e8f5e9;
+        color: #1b5e20;
+      }
+      .status-Closed {
+        background: #e8f5e9;
+        color: #1b5e20;
+      }
+      .status-Cancelled {
+        background: #ffebee;
+        color: #b71c1c;
+      }
+
+      .type-badge {
+        display: inline-block;
+        padding: 3px 10px;
+        border-radius: 12px;
+        font-size: 11px;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+      .type-contact {
+        background: #f3e5f5;
+        color: #4a148c;
+      }
+      .type-product {
+        background: #e8eaf6;
+        color: #1a237e;
+      }
+
+      .eq-card {
+        border: 1px solid #ddd;
+        padding: 16px;
+        background: #fff;
+        border-radius: 6px;
+        margin-bottom: 14px;
+        transition: 0.2s;
+        word-break: break-word;
+      }
+      .eq-card:hover {
+        border-color: #3d1f10;
+        box-shadow: 0 4px 12px rgba(61, 31, 16, 0.05);
+      }
+      .eq-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 10px;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 8px;
+      }
+      .eq-meta-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 10px;
+        font-size: 13px;
+        margin: 10px 0;
+      }
+      .eq-meta-label {
+        font-size: 10px;
+        text-transform: uppercase;
+        color: #8b6a5a;
+        letter-spacing: 0.5px;
+      }
+      .eq-meta-val {
+        font-weight: 600;
+        margin-top: 2px;
+        word-break: break-word;
+      }
+      .eq-msg-preview {
+        background: #fdf6f0;
+        border-left: 3px solid #3d1f10;
+        padding: 8px 12px;
+        border-radius: 0 4px 4px 0;
+        font-size: 13px;
+        font-style: italic;
+        color: #555;
+        margin-top: 8px;
+        word-break: break-word;
+      }
+      .eq-actions {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        flex-wrap: wrap;
+        margin-top: 12px;
+        padding-top: 12px;
+        border-top: 1px solid #eee;
+      }
+      .eq-actions select {
+        width: auto;
+        padding: 6px 12px;
+        margin: 0;
+        font-size: 12px;
+        font-weight: bold;
+      }
+      .eq-actions button {
+        padding: 7px 14px;
+        font-size: 12px;
+      }
+
+      .o-meta-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 10px;
+        font-size: 13px;
+        margin: 10px 0;
+      }
+      .o-meta-label {
+        font-size: 10px;
+        text-transform: uppercase;
+        color: #8b6a5a;
+        letter-spacing: 0.5px;
+      }
+      .o-meta-val {
+        font-weight: 600;
+        margin-top: 2px;
+        word-break: break-word;
+      }
+
+      .o-actions {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        flex-wrap: wrap;
+        margin-top: 12px;
+        padding-top: 12px;
+        border-top: 1px solid #eee;
+      }
+      .o-actions select {
+        width: auto;
+        padding: 6px 12px;
+        margin: 0;
+        font-size: 12px;
+        font-weight: bold;
+      }
+      .o-actions button {
+        padding: 7px 14px;
+        font-size: 12px;
+      }
+
+      /* MODAL OVERLAY */
+      .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        padding: 16px;
+      }
+      .modal-card {
+        background: #fff;
+        border-radius: 8px;
+        max-width: 680px;
+        width: 100%;
+        max-height: 90vh;
+        overflow-y: auto;
+        padding: 24px;
+        position: relative;
+        border: 1px solid #ddd;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        word-break: break-word;
+      }
+      .modal-close {
+        position: absolute;
+        top: 16px;
+        right: 16px;
+        background: none;
+        border: none;
+        font-size: 24px;
+        cursor: pointer;
+        color: #666;
+        line-height: 1;
+      }
+      .modal-title {
+        font-size: 20px;
+        font-weight: bold;
+        margin-bottom: 16px;
+        border-bottom: 2px solid #3d1f10;
+        padding-bottom: 8px;
+      }
+      .modal-section {
+        margin-bottom: 20px;
+      }
+      .modal-section-title {
+        font-size: 14px;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #8b6a5a;
+        margin-bottom: 10px;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 4px;
+      }
+
+      .modal-prod-item {
+        display: flex;
+        gap: 14px;
+        align-items: center;
+        padding: 10px 0;
+        border-bottom: 1px dashed #eee;
+      }
+      .modal-prod-item img {
+        width: 60px;
+        height: 72px;
+        object-fit: cover;
+        border-radius: 4px;
+        background: #f9f0ea;
+      }
+      .modal-prod-info {
+        flex: 1;
+        font-size: 13px;
+      }
+      .modal-prod-name {
+        font-weight: bold;
+        font-size: 15px;
+      }
+      .modal-prod-price {
+        font-weight: bold;
+        font-size: 14px;
+        text-align: right;
+      }
+
+      /* RESPONSIVE MEDIA QUERIES */
+      @media (max-width: 768px) {
+        body {
+          padding: 16px 3%;
+        }
+        .grid {
+          grid-template-columns: 1fr;
+        }
+        .controls-bar {
+          flex-direction: column;
+          align-items: stretch;
+        }
+        .controls-bar input,
+        .controls-bar select {
+          width: 100%;
+          min-width: 100%;
+        }
+        .admin-nav-tabs {
+          overflow-x: auto;
+          flex-wrap: wrap;
+          gap: 6px;
+        }
+        .tab-btn {
+          padding: 8px 14px;
+          font-size: 13px;
+        }
+        .summary-grid {
+          grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+          gap: 8px;
+        }
+        .summary-num {
+          font-size: 18px;
+        }
+        .summary-label {
+          font-size: 9px;
+        }
+        .modal-card {
+          padding: 16px;
+          width: 95%;
+          max-height: 92vh;
+        }
+        .modal-title {
+          font-size: 18px;
+        }
+        .p-grid {
+          grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        }
+      }
+
+      @media (max-width: 480px) {
+        .auth-bar h2 {
+          font-size: 16px;
+        }
+        .p-card-actions {
+          flex-direction: column;
+        }
+        .btn.secondary {
+          margin-left: 0;
+          margin-top: 6px;
+        }
+        .o-header,
+        .eq-header {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 4px;
+        }
+        .o-actions,
+        .eq-actions {
+          flex-direction: column;
+          align-items: stretch;
+        }
+        .o-actions select,
+        .eq-actions select {
+          width: 100%;
+        }
+        .o-actions button,
+        .eq-actions button {
+          width: 100%;
+        }
+      }
+    </style>
+
+  </head>
+  <body>
+    <div class="auth-bar">
+      <h2>THE INDIANI WAY - ADMIN PANEL</h2>
+      <div id="authBar" style="display: none; align-items: center; gap: 12px">
+        <span id="userEmail" style="font-weight: bold; color: #3d1f10"></span>
+        <button id="logoutBtn" class="btn secondary">Logout</button>
+      </div>
+    </div>
+    <p id="status" style="display: none"></p>
+
+    <!-- Firebase Admin Login Card -->
+    <div
+      class="card"
+      id="loginCard"
+      style="max-width: 420px; margin: 30px auto; display: none"
+    >
+      <h3 style="margin-bottom: 12px">Admin Login</h3>
+      <form id="loginForm">
+        <label style="font-size: 13px; font-weight: bold">Email</label>
+        <input
+          type="email"
+          id="adminEmail"
+          placeholder="admin@example.com"
+          required
+          style="display: block"
+        />
+        <label
+          style="
+            font-size: 13px;
+            font-weight: bold;
+            margin-top: 10px;
+            display: block;
+          "
+          >Password</label
+        >
+        <input
+          type="password"
+          id="adminPassword"
+          placeholder="••••••••"
+          required
+          style="display: block"
+        />
+        <button class="btn" type="submit" style="margin-top: 16px; width: 100%">
+          LOGIN
+        </button>
+        <p
+          id="loginError"
+          style="
+            color: red;
+            font-size: 13px;
+            margin-top: 10px;
+            min-height: 18px;
+          "
+        ></p>
+      </form>
+    </div>
+        <!-- Admin Panel Content (Protected) -->
+    <div id="adminContent" style="display: none">
+      <!-- Navigation Tabs -->
+      <div class="admin-nav-tabs">
+        <button id="tabProductsBtn" class="tab-btn active">Products</button>
+        <button id="tabOrdersBtn" class="tab-btn">
+          Orders <span id="ordersBadgeCount" class="badge">0</span>
+        </button>
+        <button id="tabEnquiriesBtn" class="tab-btn">
+          Enquiries <span id="enquiriesBadgeCount" class="badge">0</span>
+        </button>
+        <button id="tabNewsletterBtn" class="tab-btn">
+          Subscribers <span id="newsletterBadgeCount" class="badge">0</span>
+        </button>
+      </div>
+
+      <!-- PRODUCTS SECTION -->
+      <div id="productsSection">
+        <div class="card">
+          <h3 id="formTitle">Add Product</h3>
+          <form id="form">
+            <input type="hidden" id="editId" />
+            <div class="grid">
+              <input id="pName" placeholder="Product Name" required />
+              <select id="category" required>
+                <option value="">Category</option>
+                <option>ethnic wear</option>
+                <option>cord set</option>
+                <option>shirt</option>
+                <option>kurti</option>
+                <option>pants</option>
+                <option>frocks</option>
+                <option>skirts</option>
+                <option>jacket</option>
+                <option>stoles</option>
+              </select>
+            </div>
+            <div class="grid">
+              <input
+                id="price"
+                type="number"
+                placeholder="Original Price (eg 16400)"
+                required
+              />
+              <input
+                id="discountedPrice"
+                type="number"
+                placeholder="Discounted Price (eg 12900) - optional"
+              />
+            </div>
+            <textarea
+              id="description"
+              placeholder="Type Product Description"
+              rows="3"
+            ></textarea>
+            <p style="font-size: 12px; color: #666; margin-top: 4px">
+              Image Size must be 300 x 300px in 250kb
+            </p>
+            <label for="image" style="font-size:13px;font-weight:bold;display:block;margin-top:8px">Product Image URL / Path</label>
+            <input type="text" id="image" placeholder="images/product-name.jpg or https://..." />
+            <p style="font-size:12px;color:#666;margin-top:2px">Spark plan: image ko website ke images folder mein rakhein aur yahan uska path dein.</p>
+
+            <label style="font-size:13px;font-weight:bold;display:block;margin-top:8px">Slider Images (4)</label>
+            <div class="slider-row" style="display:flex;gap:6px;align-items:center;margin-top:6px">
+              <img class="slider-preview" alt="" style="width:40px;height:40px;object-fit:cover;border:1px solid #ddd;display:none" />
+              <input type="text" class="slider-image" placeholder="Slider image 1: path / URL or choose from gallery" style="flex:1;min-width:0" />
+              <button type="button" class="slider-pick" style="padding:8px 10px;font-size:12px;cursor:pointer;white-space:nowrap">Choose from Gallery</button>
+              <input type="file" class="slider-file" accept="image/*" style="display:none" />
+            </div>
+            <div class="slider-row" style="display:flex;gap:6px;align-items:center;margin-top:6px">
+              <img class="slider-preview" alt="" style="width:40px;height:40px;object-fit:cover;border:1px solid #ddd;display:none" />
+              <input type="text" class="slider-image" placeholder="Slider image 2: path / URL or choose from gallery" style="flex:1;min-width:0" />
+              <button type="button" class="slider-pick" style="padding:8px 10px;font-size:12px;cursor:pointer;white-space:nowrap">Choose from Gallery</button>
+              <input type="file" class="slider-file" accept="image/*" style="display:none" />
+            </div>
+            <div class="slider-row" style="display:flex;gap:6px;align-items:center;margin-top:6px">
+              <img class="slider-preview" alt="" style="width:40px;height:40px;object-fit:cover;border:1px solid #ddd;display:none" />
+              <input type="text" class="slider-image" placeholder="Slider image 3: path / URL or choose from gallery" style="flex:1;min-width:0" />
+              <button type="button" class="slider-pick" style="padding:8px 10px;font-size:12px;cursor:pointer;white-space:nowrap">Choose from Gallery</button>
+              <input type="file" class="slider-file" accept="image/*" style="display:none" />
+            </div>
+            <div class="slider-row" style="display:flex;gap:6px;align-items:center;margin-top:6px">
+              <img class="slider-preview" alt="" style="width:40px;height:40px;object-fit:cover;border:1px solid #ddd;display:none" />
+              <input type="text" class="slider-image" placeholder="Slider image 4: path / URL or choose from gallery" style="flex:1;min-width:0" />
+              <button type="button" class="slider-pick" style="padding:8px 10px;font-size:12px;cursor:pointer;white-space:nowrap">Choose from Gallery</button>
+              <input type="file" class="slider-file" accept="image/*" style="display:none" />
+            </div>
+            <p style="font-size:12px;color:#666;margin-top:4px">Gallery se image chuno ya path / URL likho. Gallery wali image automatically chhoti (compress) hoke save hoti hai.</p>
+
+            <div class="checkbox-row">
+              <input type="checkbox" id="isFeatured" />
+              <label for="isFeatured">🌟Show on homepage (featured) </label>
+            </div>
+
+            <p style="margin-top: 10px; font-weight: bold">Available Sizes</p>
+            <div class="checkbox-row">
+              <input type="checkbox" class="size-check" value="S" id="sizeS" />
+              <label for="sizeS">S</label>
+              <input type="checkbox" class="size-check" value="M" id="sizeM" />
+              <label for="sizeM">M</label>
+              <input type="checkbox" class="size-check" value="L" id="sizeL" />
+              <label for="sizeL">L</label>
+              <input
+                type="checkbox"
+                class="size-check"
+                value="XL"
+                id="sizeXL"
+              />
+              <label for="sizeXL">XL</label>
+            </div>
+
+            <button class="btn" type="submit">SAVE</button>
+            <button
+              class="btn secondary"
+              type="button"
+              id="cancel"
+              style="display: none"
+            >
+              Cancel Edit
+            </button>
+          </form>
+        </div>
+
+        <div class="p-grid" id="list"></div>
+      </div>
+
+      <!-- ORDERS SECTION -->
+      <div id="ordersSection" style="display: none">
+        <div class="summary-grid">
+          <div class="summary-card">
+            <div class="summary-num" id="sumTotal">0</div>
+            <div class="summary-label">Total Orders</div>
+          </div>
+          <div class="summary-card">
+            <div class="summary-num" id="sumPending" style="color: #e65100">0</div>
+            <div class="summary-label">Pending</div>
+          </div>
+          <div class="summary-card">
+            <div class="summary-num" id="sumConfirmed" style="color: #0d47a1">0</div>
+            <div class="summary-label">Confirmed</div>
+          </div>
+          <div class="summary-card">
+            <div class="summary-num" id="sumProcessing" style="color: #4a148c">0</div>
+            <div class="summary-label">Processing</div>
+          </div>
+          <div class="summary-card">
+            <div class="summary-num" id="sumShipped" style="color: #1a237e">0</div>
+            <div class="summary-label">Shipped</div>
+          </div>
+          <div class="summary-card">
+            <div class="summary-num" id="sumDelivered" style="color: #1b5e20">0</div>
+            <div class="summary-label">Delivered</div>
+          </div>
+          <div class="summary-card">
+            <div class="summary-num" id="sumCancelled" style="color: #b71c1c">0</div>
+            <div class="summary-label">Cancelled</div>
+          </div>
+        </div>
+
+        <div class="controls-bar card" style="padding: 14px">
+          <input
+            type="text"
+            id="orderSearchInput"
+            placeholder="Search by Order ID, Customer Name, Phone, Email..."
+          />
+          <select id="orderStatusFilter">
+            <option value="All">All Statuses</option>
+            <option value="Pending">Pending</option>
+            <option value="Confirmed">Confirmed</option>
+            <option value="Processing">Processing</option>
+            <option value="Shipped">Shipped</option>
+            <option value="Delivered">Delivered</option>
+            <option value="Cancelled">Cancelled</option>
+          </select>
+        </div>
+
+        <div id="ordersList"></div>
+      </div>
+
+      <!-- ENQUIRIES SECTION -->
+      <div id="enquiriesSection" style="display: none">
+        <div class="summary-grid">
+          <div class="summary-card">
+            <div class="summary-num" id="sumEnquiriesTotal">0</div>
+            <div class="summary-label">Total Enquiries</div>
+          </div>
+          <div class="summary-card">
+            <div class="summary-num" id="sumEnquiriesNew" style="color: #e65100">0</div>
+            <div class="summary-label">New</div>
+          </div>
+          <div class="summary-card">
+            <div class="summary-num" id="sumEnquiriesContacted" style="color: #0d47a1">0</div>
+            <div class="summary-label">Contacted</div>
+          </div>
+          <div class="summary-card">
+            <div class="summary-num" id="sumEnquiriesClosed" style="color: #1b5e20">0</div>
+            <div class="summary-label">Closed</div>
+          </div>
+          <div class="summary-card">
+            <div class="summary-num" id="sumEnquiriesContactType" style="color: #4a148c">0</div>
+            <div class="summary-label">Contact Type</div>
+          </div>
+          <div class="summary-card">
+            <div class="summary-num" id="sumEnquiriesProductType" style="color: #1a237e">0</div>
+            <div class="summary-label">Product Type</div>
+          </div>
+        </div>
+
+        <div class="controls-bar card" style="padding: 14px">
+          <input
+            type="text"
+            id="enquirySearchInput"
+            placeholder="Search by Name, Email, Phone, Product, Interest, Message..."
+          />
+          <select id="enquiryFilter">
+            <option value="All">All Enquiries</option>
+            <option value="New">New Status</option>
+            <option value="Contacted">Contacted Status</option>
+            <option value="Closed">Closed Status</option>
+            <option value="Contact">Contact Type</option>
+            <option value="Product">Product Type</option>
+          </select>
+        </div>
+
+        <div id="enquiriesList"></div>
+      </div>
+
+      <!-- NEWSLETTER SECTION -->
+      <div id="newsletterSection" style="display: none">
+        <div class="summary-grid">
+          <div class="summary-card">
+            <div class="summary-num" id="sumSubscribersTotal">0</div>
+            <div class="summary-label">Total Subscribers</div>
+          </div>
+        </div>
+
+        <div class="controls-bar card" style="padding: 14px">
+          <input
+            type="text"
+            id="newsletterSearchInput"
+            placeholder="Search subscribers by email..."
+          />
+        </div>
+
+        <div id="subscribersList"></div>
+      </div>
+    </div>
+
+    <!-- ORDER DETAILS MODAL -->
+    <div class="modal-overlay" id="orderModal" style="display: none">
+      <div class="modal-card">
+        <button class="modal-close" id="modalCloseBtn">✕</button>
+        <div class="modal-title" id="modalTitle">Order Details</div>
+        <div id="modalBody"></div>
+      </div>
+    </div>
+
+    <!-- ENQUIRY DETAILS MODAL -->
+    <div class="modal-overlay" id="enquiryModal" style="display: none">
+      <div class="modal-card">
+        <button class="modal-close" id="enquiryModalCloseBtn">✕</button>
+        <div class="modal-title" id="enquiryModalTitle">Enquiry Details</div>
+        <div id="enquiryModalBody"></div>
+      </div>
+    </div>
+<script type="module">
+   
+import { auth, db } from "./firebase-config.js";
+
+import {
+  signInWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged,
+} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+
+import {
+  collection,
+  getDocs,
+  doc,
+  getDoc,
+  addDoc,
+  setDoc,
+  updateDoc,
+  deleteDoc,
+  serverTimestamp,
+  query,
+  orderBy,
+} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+// DOM Elements
+const statusEl = document.getElementById("status");
+const urlParams = new URLSearchParams(window.location.search);
+
+const authBar = document.getElementById("authBar");
+const userEmailEl = document.getElementById("userEmail");
+const loginCard = document.getElementById("loginCard");
+const adminContent = document.getElementById("adminContent");
+const loginForm = document.getElementById("loginForm");
+const loginError = document.getElementById("loginError");
+const logoutBtn = document.getElementById("logoutBtn");
+
+const tabProductsBtn = document.getElementById("tabProductsBtn");
+const tabOrdersBtn = document.getElementById("tabOrdersBtn");
+const tabEnquiriesBtn = document.getElementById("tabEnquiriesBtn");
+const tabNewsletterBtn = document.getElementById("tabNewsletterBtn");
+
+const productsSection = document.getElementById("productsSection");
+const ordersSection = document.getElementById("ordersSection");
+const enquiriesSection = document.getElementById("enquiriesSection");
+const newsletterSection = document.getElementById("newsletterSection");
+
+const ordersBadgeCount = document.getElementById("ordersBadgeCount");
+const enquiriesBadgeCount = document.getElementById("enquiriesBadgeCount");
+const newsletterBadgeCount = document.getElementById("newsletterBadgeCount");
+
+const ordersList = document.getElementById("ordersList");
+const orderSearchInput = document.getElementById("orderSearchInput");
+const orderStatusFilter = document.getElementById("orderStatusFilter");
+
+const orderModal = document.getElementById("orderModal");
+const modalCloseBtn = document.getElementById("modalCloseBtn");
+const modalBody = document.getElementById("modalBody");
+const modalTitle = document.getElementById("modalTitle");
+
+const enquiriesList = document.getElementById("enquiriesList");
+const enquirySearchInput = document.getElementById("enquirySearchInput");
+const enquiryFilter = document.getElementById("enquiryFilter");
+
+const enquiryModal = document.getElementById("enquiryModal");
+const enquiryModalCloseBtn = document.getElementById("enquiryModalCloseBtn");
+const enquiryModalBody = document.getElementById("enquiryModalBody");
+const enquiryModalTitle = document.getElementById("enquiryModalTitle");
+
+const subscribersList = document.getElementById("subscribersList");
+const newsletterSearchInput = document.getElementById("newsletterSearchInput");
+
+console.log("ADMIN MODULE STARTED");
+
+if (statusEl) {
+  statusEl.innerText = "Admin JavaScript Loaded...";
+}
+
+let currentEditingProduct = null;
+let loadedOrdersData = [];
+let loadedEnquiriesData = [];
+let loadedSubscribersData = [];
+
+// PRODUCT ELEMENTS
+const productForm = document.getElementById("form");
+const productList = document.getElementById("list");
+const cancelBtn = document.getElementById("cancel");
+const editIdInput = document.getElementById("editId");
+
+// HTML special characters protection
+function escapeHTML(value = "") {
+  return String(value).replace(/[&<>"']/g, (char) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  })[char]);
+}
+
+// LOAD PRODUCTS FROM FIRESTORE
+async function loadProducts() {
+  productList.innerHTML = "Loading products...";
+
+  try {
+    const snapshot = await getDocs(collection(db, "products"));
+
+    productList.innerHTML = "";
+
+    if (snapshot.empty) {
+      productList.innerHTML = "<p>No products found.</p>";
+      return;
+    }
+
+    snapshot.forEach((productDoc) => {
+      const p = productDoc.data();
+      const id = productDoc.id;
+
+      productList.innerHTML += `
+        <div class="p-card">
+          <img src="${escapeHTML(p.image || "")}"
+               alt="${escapeHTML(p.name || "Product")}"
+               onerror="this.style.display='none'">
+
+          <h3>${escapeHTML(p.name || "")}</h3>
+          <p>Category: ${escapeHTML(p.category || "")}</p>
+          <p>Price: ₹${escapeHTML(p.price ?? "")}</p>
+          <p>Discount: ₹${escapeHTML(p.discountedPrice ?? "")}</p>
+          <p>Sizes: ${escapeHTML((p.sizes || []).join(", "))}</p>
+          ${p.featured === true || p.isFeatured === true ? '<span class="featured-badge">Featured</span>' : ""}
+
+          <div class="p-card-actions">
+            <button type="button" data-edit="${id}">Edit</button>
+            <button type="button" data-delete="${id}">Delete</button>
+          </div>
+        </div>
+      `;
+    });
+
+  } catch (error) {
+    console.error("Load Products Error:", error);
+    productList.innerHTML = "Products load nahi hue: " +
+      escapeHTML(error.message);
+  }
+}
+
+// SAVE OR UPDATE PRODUCT
+productForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const user = auth.currentUser;
+
+  if (!user || user.email !== "theindianiway2026@gmail.com") {
+    alert("Only admin can save products.");
+    return;
+  }
+
+  const name = document.getElementById("pName").value.trim();
+  const category = document.getElementById("category").value;
+  const price = Number(document.getElementById("price").value);
+  const discountedPriceValue =
+    document.getElementById("discountedPrice").value;
+
+  const sizes = Array.from(
+    document.querySelectorAll(".size-check:checked")
+  ).map((checkbox) => checkbox.value);
+
+  const product = {
+    name,
+    category,
+    price,
+    discountedPrice: discountedPriceValue
+      ? Number(discountedPriceValue)
+      : null,
+    description: document.getElementById("description").value.trim(),
+    image: document.getElementById("image").value.trim(),
+    images: Array.from(document.querySelectorAll(".slider-image"))
+      .map((i) => i.value.trim())
+      .filter(Boolean),
+    featured: document.getElementById("isFeatured").checked,
+    isFeatured: document.getElementById("isFeatured").checked,
+    sizes,
+    updatedAt: serverTimestamp()
+  };
+
+  if (!name || !category || !price || price <= 0) {
+    alert("Please enter valid product details.");
+    return;
+  }
+
+  const saveButton = productForm.querySelector('button[type="submit"]');
+  saveButton.disabled = true;
+  saveButton.innerText = "Saving...";
+
+  try {
+    const editId = editIdInput.value;
+
+    if (editId) {
+      await updateDoc(doc(db, "products", editId), product);
+      alert("Product updated successfully!");
+    } else {
+      product.createdAt = serverTimestamp();
+      await addDoc(collection(db, "products"), product);
+      alert("Product saved successfully!");
+    }
+
+    productForm.reset();
+    editIdInput.value = "";
+    document.getElementById("formTitle").innerText = "Add Product";
+    cancelBtn.style.display = "none";
+
+    await loadProducts();
+
+  } catch (error) {
+    console.error("Save Product Error:", error);
+    alert("Product save nahi hua: " + error.message);
+  } finally {
+    saveButton.disabled = false;
+    saveButton.innerText = "SAVE";
+  }
+});
+
+// EDIT AND DELETE BUTTONS
+productList.addEventListener("click", async (e) => {
+  const editId = e.target.dataset.edit;
+  const deleteId = e.target.dataset.delete;
+
+  if (editId) {
+    try {
+      const productRef = doc(db, "products", editId);
+      const snapshot = await getDoc(productRef);
+
+      if (!snapshot.exists()) return;
+
+      const p = snapshot.data();
+
+      document.getElementById("pName").value = p.name || "";
+      document.getElementById("category").value = p.category || "";
+      document.getElementById("price").value = p.price ?? "";
+      document.getElementById("discountedPrice").value =
+        p.discountedPrice ?? "";
+      document.getElementById("description").value = p.description || "";
+      document.getElementById("image").value = p.image || "";
+      document.querySelectorAll(".slider-image").forEach((input, i) => {
+        input.value = (Array.isArray(p.images) && p.images[i]) || "";
+        input.dispatchEvent(new Event("input"));
+      });
+      document.getElementById("isFeatured").checked =
+        p.isFeatured === true || p.featured === true;
+
+      document.querySelectorAll(".size-check").forEach((checkbox) => {
+        checkbox.checked = (p.sizes || []).includes(checkbox.value);
+      });
+
+      editIdInput.value = editId;
+      document.getElementById("formTitle").innerText = "Edit Product";
+      cancelBtn.style.display = "inline-block";
+
+      window.scrollTo({ top: 0, behavior: "smooth" });
+
+    } catch (error) {
+      alert("Edit error: " + error.message);
+    }
+  }
+
+  if (deleteId) {
+    if (!confirm("Delete this product?")) return;
+
+    try {
+      await deleteDoc(doc(db, "products", deleteId));
+      alert("Product deleted successfully!");
+      await loadProducts();
+    } catch (error) {
+      alert("Delete error: " + error.message);
+    }
+  }
+});
+
+// CANCEL EDIT
+cancelBtn.addEventListener("click", () => {
+  productForm.reset();
+  editIdInput.value = "";
+  document.getElementById("formTitle").innerText = "Add Product";
+  cancelBtn.style.display = "none";
+});
+
+// Admin Login
+loginForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const email = document.getElementById("adminEmail").value.trim();
+  const password = document.getElementById("adminPassword").value;
+
+  loginError.innerText = "Logging in...";
+
+  try {
+    await signInWithEmailAndPassword(auth, email, password);
+    loginError.innerText = "";
+  } catch (error) {
+    loginError.innerText = error.message;
+  }
+});
+
+// Admin Logout
+logoutBtn.addEventListener("click", async () => {
+  try {
+    await signOut(auth);
+  } catch (error) {
+    console.error("Logout error:", error);
+  }
+});
+
+// ORDERS TAB
+tabOrdersBtn.addEventListener("click", async () => {
+  productsSection.style.display = "none";
+  ordersSection.style.display = "block";
+  enquiriesSection.style.display = "none";
+  newsletterSection.style.display = "none";
+
+  tabProductsBtn.classList.remove("active");
+  tabOrdersBtn.classList.add("active");
+  tabEnquiriesBtn.classList.remove("active");
+  tabNewsletterBtn.classList.remove("active");
+
+  await loadOrders();
+});
+
+async function loadEnquiries() {
+    enquiriesList.innerHTML = "Loading enquiries...";
+
+    try {
+        const snapshot = await getDocs(
+            query(
+                collection(db, "enquiries"),
+                orderBy("createdAt", "desc")
+            )
+        );
+
+        loadedEnquiriesData = [];
+
+        snapshot.forEach((docSnap) => {
+            loadedEnquiriesData.push({
+                id: docSnap.id,
+                ...docSnap.data()
+            });
+        });
+
+        enquiriesBadgeCount.textContent = loadedEnquiriesData.length;
+
+        if (loadedEnquiriesData.length === 0) {
+            enquiriesList.innerHTML = "No enquiries found.";
+            return;
+        }
+
+        enquiriesList.innerHTML = loadedEnquiriesData.map((item) => `
+            <div class="order-card" style="padding:15px; margin-bottom:12px;">
+                <h3>${escapeEnquiryHTML(item.customerName)}</h3>
+                <p>Product: ${escapeEnquiryHTML(item.productName)}</p>
+                <p>Email: ${escapeEnquiryHTML(item.customerEmail)}</p>
+                <p>Phone: ${escapeEnquiryHTML(item.customerPhone)}</p>
+                <p>Status: ${escapeEnquiryHTML(item.status)}</p>
+                <button class="btn-primary" data-enquiry-id="${item.id}">
+                    VIEW ENQUIRY
+                </button>
+            </div>
+        `).join("");
+
+    } catch (error) {
+        console.error("Enquiry loading error:", error);
+        enquiriesList.textContent = "Could not load enquiries: " + error.message;
+    }
+}
+ 
+function escapeEnquiryHTML(value) {
+    return String(value ?? "").replace(/[&<>"']/g, (char) => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+    })[char]);
+}
+// LOAD NEWSLETTER SUBSCRIBERS
+async function loadSubscribers() {
+    subscribersList.innerHTML = "Loading subscribers...";
+
+    try {
+        const snapshot = await getDocs(
+            query(
+                collection(db, "subscribers"),
+                orderBy("createdAt", "desc")
+            )
+        );
+
+        loadedSubscribersData = [];
+
+        snapshot.forEach((docSnap) => {
+            loadedSubscribersData.push({
+                id: docSnap.id,
+                ...docSnap.data()
+            });
+        });
+
+        // Remove duplicate emails from display
+        loadedSubscribersData = [
+            ...new Map(
+                loadedSubscribersData.map(item => [
+                    (item.email || "").toLowerCase(),
+                    item
+                ])
+            ).values()
+        ];
+
+        const total = loadedSubscribersData.length;
+
+        newsletterBadgeCount.textContent = total;
+        document.getElementById("sumSubscribersTotal").textContent = total;
+
+        renderSubscribers(loadedSubscribersData);
+
+    } catch (error) {
+        console.error("Subscriber loading error:", error);
+        subscribersList.textContent =
+            "Could not load subscribers: " + error.message;
+    }
+}
+
+
+// DISPLAY SUBSCRIBERS
+function renderSubscribers(list) {
+    if (list.length === 0) {
+        subscribersList.innerHTML = "No subscribers found.";
+        return;
+    }
+
+    subscribersList.innerHTML = list.map((item) => `
+        <div class="order-card" style="padding:15px; margin-bottom:12px;">
+            <h3>${escapeEnquiryHTML(item.email || "")}</h3>
+            <p>Status: ${escapeEnquiryHTML(item.status || "Subscribed")}</p>
+        </div>
+    `).join("");
+}
+// NEWSLETTER SEARCH
+newsletterSearchInput.addEventListener("input", () => {
+    const searchText = newsletterSearchInput.value.trim().toLowerCase();
+
+    const filteredSubscribers = loadedSubscribersData.filter(item =>
+        (item.email || "").toLowerCase().includes(searchText)
+    );
+
+    renderSubscribers(filteredSubscribers);
+});
+
+
+// NEWSLETTER TAB
+tabNewsletterBtn.addEventListener("click", async () => {
+    productsSection.style.display = "none";
+    ordersSection.style.display = "none";
+    enquiriesSection.style.display = "none";
+    newsletterSection.style.display = "block";
+
+    tabProductsBtn.classList.remove("active");
+    tabOrdersBtn.classList.remove("active");
+    tabEnquiriesBtn.classList.remove("active");
+    tabNewsletterBtn.classList.add("active");
+
+    await loadSubscribers();
+});
+// OPEN ENQUIRY DETAILS
+enquiriesList.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-enquiry-id]");
+    if (!button) return;
+
+    const enquiry = loadedEnquiriesData.find(
+        item => item.id === button.dataset.enquiryId
+    );
+
+    if (!enquiry) return;
+
+    enquiryModalTitle.textContent = "Customer Enquiry";
+
+    enquiryModalBody.innerHTML = `
+        <p><b>Name:</b> ${escapeEnquiryHTML(enquiry.customerName)}</p>
+        <p><b>Product:</b> ${escapeEnquiryHTML(enquiry.productName)}</p>
+        <p><b>Email:</b> ${escapeEnquiryHTML(enquiry.customerEmail)}</p>
+        <p><b>Phone:</b> ${escapeEnquiryHTML(enquiry.customerPhone)}</p>
+        <p><b>Message:</b> ${escapeEnquiryHTML(enquiry.message)}</p>
+        <p><b>Status:</b> ${escapeEnquiryHTML(enquiry.status)}</p>
+    `;
+
+    enquiryModal.style.display = "flex";
+});
+
+// CLOSE ENQUIRY MODAL
+enquiryModalCloseBtn.addEventListener("click", () => {
+    enquiryModal.style.display = "none";
+});
+
+// ENQUIRIES TAB
+tabEnquiriesBtn.addEventListener("click", async () => {
+    productsSection.style.display = "none";
+    ordersSection.style.display = "none";
+    enquiriesSection.style.display = "block";
+    newsletterSection.style.display = "none";
+
+    tabProductsBtn.classList.remove("active");
+    tabOrdersBtn.classList.remove("active");
+    tabEnquiriesBtn.classList.add("active");
+    tabNewsletterBtn.classList.remove("active");
+
+    await loadEnquiries();
+});
+
+
+// PRODUCTS TAB
+tabProductsBtn.addEventListener("click", () => {
+  productsSection.style.display = "block";
+  ordersSection.style.display = "none";
+  enquiriesSection.style.display = "none";
+  newsletterSection.style.display = "none";
+
+  tabProductsBtn.classList.add("active");
+  tabOrdersBtn.classList.remove("active");
+  tabEnquiriesBtn.classList.remove("active");
+  tabNewsletterBtn.classList.remove("active");
+});
+
+// LOAD ORDERS FROM FIRESTORE
+async function loadOrders() {
+  ordersList.innerHTML = "Loading orders...";
+
+  try {
+    const snapshot = await getDocs(
+      query(collection(db, "orders"), orderBy("createdAt", "desc"))
+    );
+
+    loadedOrdersData = [];
+
+    snapshot.forEach((orderDoc) => {
+      loadedOrdersData.push({
+        id: orderDoc.id,
+        ...orderDoc.data()
+      });
+    });
+
+    document.getElementById("sumTotal").textContent =
+      loadedOrdersData.length;
+
+    document.getElementById("sumPending").textContent =
+      loadedOrdersData.filter(o => o.status === "Pending").length;
+
+    document.getElementById("sumConfirmed").textContent =
+      loadedOrdersData.filter(o => o.status === "Confirmed").length;
+
+    document.getElementById("sumProcessing").textContent =
+      loadedOrdersData.filter(o => o.status === "Processing").length;
+
+    document.getElementById("sumShipped").textContent =
+      loadedOrdersData.filter(o => o.status === "Shipped").length;
+
+    document.getElementById("sumDelivered").textContent =
+      loadedOrdersData.filter(o => o.status === "Delivered").length;
+
+    document.getElementById("sumCancelled").textContent =
+      loadedOrdersData.filter(o => o.status === "Cancelled").length;
+
+    ordersBadgeCount.textContent = loadedOrdersData.length;
+
+    if (loadedOrdersData.length === 0) {
+      ordersList.innerHTML = "<p>No orders found.</p>";
+      return;
+    }
+
+    ordersList.innerHTML = loadedOrdersData.map(order => `
+      <div class="o-card">
+        <div class="o-header">
+          <div class="o-id">${escapeHTML(order.orderId || order.id)}</div>
+          <span class="o-status-badge">
+            ${escapeHTML(order.status || "Pending")}
+          </span>
+        </div>
+
+        <div class="o-meta-grid">
+          <div>
+            <div class="o-meta-label">Customer Name</div>
+            <div class="o-meta-val">${escapeHTML(order.customerName || "")}</div>
+          </div>
+          <div>
+            <div class="o-meta-label">Phone</div>
+            <div class="o-meta-val">${escapeHTML(order.customerPhone || "")}</div>
+          </div>
+          <div>
+            <div class="o-meta-label">Email</div>
+            <div class="o-meta-val">${escapeHTML(order.customerEmail || "")}</div>
+          </div>
+          <div>
+            <div class="o-meta-label">Total Amount</div>
+            <div class="o-meta-val">₹${Number(order.totalAmount || 0)}</div>
+          </div>
+        </div>
+
+        <button class="btn" type="button" data-view-order="${escapeHTML(order.id)}">
+          VIEW DETAILS
+        </button>
+      </div>
+    `).join("");
+
+  } catch (error) {
+    console.error("Load Orders Error:", error);
+    ordersList.innerHTML = "Orders load nahi hue: " +
+      escapeHTML(error.message);
+  }
+}
+
+// VIEW ORDER DETAILS
+ordersList.addEventListener("click", (e) => {
+  const orderId = e.target.dataset.viewOrder;
+  if (!orderId) return;
+
+  const order = loadedOrdersData.find(o => o.id === orderId);
+  if (!order) return;
+
+  modalTitle.textContent = "Order Details - " + (order.orderId || order.id);
+
+  modalBody.innerHTML = `
+    <p><b>Customer:</b> ${escapeHTML(order.customerName || "")}</p>
+    <p><b>Phone:</b> ${escapeHTML(order.customerPhone || "")}</p>
+    <p><b>Email:</b> ${escapeHTML(order.customerEmail || "")}</p>
+    <p><b>Address:</b> ${escapeHTML(order.customerAddress || "")}</p>
+    <p><b>Pincode:</b> ${escapeHTML(order.pincode || "")}</p>
+    <p><b>Status:</b> ${escapeHTML(order.status || "Pending")}</p>
+    <h3>Products</h3>
+    ${(order.products || []).map(p => `
+      <p>${escapeHTML(p.name || "")} × ${Number(p.qty || 0)}
+      — ₹${Number(p.price || p.discountedPrice || 0) * Number(p.qty || 0)}</p>
+    `).join("")}
+    <h3>Total: ₹${Number(order.totalAmount || 0)}</h3>
+  `;
+
+  orderModal.style.display = "flex";
+});
+
+modalCloseBtn.addEventListener("click", () => {
+  orderModal.style.display = "none";
+});
+
+
+// Authentication Check
+
+onAuthStateChanged(auth, async (user) => {
+  console.log("AUTH CALLBACK:", user);
+
+  if (user && user.email === "theindianiway2026@gmail.com") {
+    statusEl.innerText = "Authenticated as Admin: " + user.email;
+
+    loginCard.style.display = "none";
+    adminContent.style.display = "block";
+    authBar.style.display = "flex";
+    userEmailEl.innerText = user.email;
+
+    await loadProducts();
+    await loadOrders();
+
+  } else {
+    if (user) {
+      await signOut(auth);
+      alert("This account is not authorized as admin.");
+    }
+
+    statusEl.innerText = "Please log in with Admin credentials.";
+
+    loginCard.style.display = "block";
+    adminContent.style.display = "none";
+    authBar.style.display = "none";
+  }
+
+}, (error) => {
+  console.error("Auth Observer Error:", error);
+  statusEl.innerText = "Authentication Error: " + error.message;
+});
+
+</script>
+
+<script>
+/* Slider images: choose from gallery (resized + compressed, saved with the product) */
+(function () {
+  function compress(file, cb) {
+    var reader = new FileReader();
+    reader.onload = function () {
+      var img = new Image();
+      img.onload = function () {
+        var max = 800, w = img.width, h = img.height;
+        if (w > max || h > max) {
+          var r = Math.min(max / w, max / h);
+          w = Math.round(w * r); h = Math.round(h * r);
+        }
+        var c = document.createElement("canvas");
+        c.width = w; c.height = h;
+        c.getContext("2d").drawImage(img, 0, 0, w, h);
+        cb(c.toDataURL("image/jpeg", 0.75));
+      };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  }
+  function refresh(row) {
+    var input = row.querySelector(".slider-image");
+    var prev = row.querySelector(".slider-preview");
+    var v = input.value.trim();
+    if (v) { prev.src = v; prev.style.display = "block"; }
+    else { prev.removeAttribute("src"); prev.style.display = "none"; }
+  }
+  document.querySelectorAll(".slider-row").forEach(function (row) {
+    var input = row.querySelector(".slider-image");
+    var file = row.querySelector(".slider-file");
+    row.querySelector(".slider-pick").addEventListener("click", function () { file.click(); });
+    file.addEventListener("change", function () {
+      if (!file.files[0]) return;
+      compress(file.files[0], function (data) {
+        input.value = data;
+        refresh(row);
+        var total = 0;
+        document.querySelectorAll(".slider-image").forEach(function (i) { total += i.value.length; });
+        if (total > 700000) alert("Images bahut badi hain. Chhoti images chuno, warna save nahi hoga.");
+        file.value = "";
+      });
+    });
+    input.addEventListener("input", function () { refresh(row); });
+  });
+  var form = document.getElementById("form");
+  if (form) form.addEventListener("reset", function () {
+    setTimeout(function () { document.querySelectorAll(".slider-row").forEach(refresh); }, 0);
+  });
+})();
+</script>

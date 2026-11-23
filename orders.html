@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your Orders - The Indiani Way</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<script type="importmap">
+{
+  "imports": {
+    "firebase/app": "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js",
+    "firebase/auth": "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js",
+    "firebase/firestore": "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js"
+  }
+}
+</script>
+<style>
+:root{
+    --bg-main: #FDF6F0;
+    --bg-card: #F9F0EA;
+    --text-dark: #3D2116;
+    --text-light: #8B6A5A;
+    --white: #FFFBF7;
+    --brown-dark: #3D1F10;
+    --red-accent: #9B1C1C;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{width:100%; overflow-x:hidden;}
+body{font-family:'Inter', sans-serif;background:var(--bg-main);color:var(--text-dark);}
+
+.navbar{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:18px 5%; background:var(--white);
+    border-bottom:1px solid #EAE0D8;
+    position:sticky; top:0; z-index:100;
+    width:100%;
+}
+.logo{font-family:'Cormorant Garamond', serif;letter-spacing:3px;font-size:clamp(16px, 2vw, 19px);font-weight:500;cursor:pointer;}
+.nav-links{display:flex;gap:24px;list-style:none;font-size:11px;letter-spacing:2px; align-items:center;}
+.nav-links a{text-decoration:none;color:var(--text-dark);font-weight:500; position:relative; padding-bottom:3px;}
+.nav-links a.active::after, .nav-links a:hover::after{content:''; position:absolute; left:0; bottom:0; width:100%; height:1.5px; background:var(--red-accent);}
+.enquiry-count{ background:var(--red-accent); color:#fff; font-size:9px; padding:2px 6px; border-radius:10px; margin-left:4px; }
+
+.page-header{padding:30px 5% 15px; width:100%;}
+.main-heading{font-family:'Cormorant Garamond', serif; font-size: clamp(32px, 5vw, 52px); font-weight:400;}
+.page-sub{font-size:11px; letter-spacing:2px; opacity:0.6; text-transform:uppercase; margin-top:6px;}
+
+.orders-page{min-height:70vh; padding:10px 5% 60px;}
+
+/* EMPTY STATE */
+.empty-state{ padding: 80px 5%; text-align:center; }
+.empty-state p{font-family:'Cormorant Garamond', serif; font-size: 22px; opacity:.7; margin-bottom:22px;}
+.empty-state a.shop-btn{
+    display:inline-block; padding:13px 30px; border:1px solid var(--text-dark);
+    background:transparent; color:var(--text-dark); text-decoration:none;
+    font-size:10px; letter-spacing:2px; text-transform:uppercase; transition:0.2s;
+}
+.empty-state a.shop-btn:hover{background:var(--text-dark); color:var(--white);}
+
+/* ORDER CONFIRMATION & DETAILS */
+.order-container { max-width: 680px; margin: 0 auto; }
+.order-success{
+    background:var(--white); border:1px solid #EAE0D8;
+    padding:30px; text-align:center; margin-bottom:24px;
+}
+.order-success .success-icon{width:50px; height:50px; border-radius:50%; background:#E6F4EA; color:#137333; display:grid; place-items:center; font-size:20px; margin:0 auto 14px;}
+.order-success h3{font-family:'Cormorant Garamond', serif; font-size:24px; margin-bottom:6px;}
+.order-success p{font-size:13px; opacity:0.75;}
+.order-success .order-id{font-weight:600; color:var(--red-accent);}
+
+.order-details-card {
+    background:var(--white); border:1px solid #EAE0D8;
+    padding:24px; margin-bottom:24px;
+}
+.order-section-title {
+    font-family:'Cormorant Garamond', serif; font-size:20px; margin-bottom:16px;
+    border-bottom:1px solid #EAE0D8; padding-bottom:8px; display:flex; justify-content:space-between; align-items:center;
+}
+.order-status-badge {
+    display:inline-block; padding:4px 12px; font-size:10px; font-weight:600;
+    background:#FFF3E0; color:#E65100; border-radius:12px; text-transform:uppercase; letter-spacing:1px;
+}
+.order-info-grid {
+    display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:16px; font-size:13px; margin-bottom:24px;
+}
+.order-info-label { font-size:10px; letter-spacing:1px; text-transform:uppercase; color:var(--text-light); margin-bottom:2px; }
+.order-info-value { font-weight:500; word-break:break-word; }
+
+.order-products-list { display:flex; flex-direction:column; gap:12px; margin-bottom:20px; }
+.order-product-item {
+    display:flex; gap:16px; align-items:center; padding:12px 0; border-bottom:1px dashed #EAE0D8;
+}
+.order-product-item:last-child { border-bottom:none; }
+.order-product-item img { width:60px; height:72px; object-fit:cover; background:var(--bg-card); flex-shrink:0; }
+.order-product-info { flex:1; font-size:13px; }
+.order-product-name { font-family:'Cormorant Garamond', serif; font-size:17px; font-weight:600; }
+.order-product-meta { font-size:11px; color:var(--text-light); margin-top:3px; }
+.order-product-price { font-size:14px; font-weight:600; text-align:right; white-space:nowrap; }
+
+.order-summary-row {
+    display:flex; justify-content:space-between; align-items:center;
+    padding-top:16px; border-top:1px solid #EAE0D8; font-size:15px; font-weight:600;
+}
+.order-summary-row .total-price { font-family:'Cormorant Garamond', serif; font-size:24px; color:var(--brown-dark); }
+
+@media (max-width: 600px){
+    .navbar{padding:14px 4%;}
+    .page-header{padding:20px 4% 10px;}
+    .orders-page{padding:10px 4% 50px;}
+    .order-info-grid{grid-template-columns: 1fr;}
+}
+</style>
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="logo" onclick="window.location.href='product.html'" title="Go to Home"> <- Back</div>
+    <ul class="nav-links">
+        <li><a href="index.html">HOME</a></li>
+    </ul>
+</nav>
+
+<div class="page-header">
+    <h1 class="main-heading">Your Orders</h1>
+    <p class="page-sub">Track Your Purchases</p>
+</div>
+
+<div class="orders-page" id="ordersPage">
+    <div id="ordersContent"></div>
+</div>
+
+<script type="module">
+import { auth, db } from './firebase-config.js';
+import { signInAnonymously } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
+
+async function ensureCustomerAuth() {
+    if (auth.currentUser) {
+        return auth.currentUser;
+    }
+    const userCred = await signInAnonymously(auth);
+    return userCred.user;
+}
+
+function formatTimestamp(ts) {
+    if (!ts) return '';
+    if (typeof ts.toDate === 'function') {
+        return ts.toDate().toLocaleString();
+    }
+    if (ts.seconds) {
+        return new Date(ts.seconds * 1000).toLocaleString();
+    }
+    return new Date(ts).toLocaleString();
+}
+
+function getItemPrice(item) {
+    return parseInt(item.discountedPrice || item.price || 0);
+}
+
+function escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
+async function renderOrders() {
+    const ordersContent = document.getElementById('ordersContent');
+    const params = new URLSearchParams(window.location.search);
+    const orderId = params.get('orderId');
+
+    if (!orderId) {
+        ordersContent.innerHTML = `
+        <div class="empty-state">
+            <p>No order specified</p>
+            <a href="product.html" class="shop-btn">START SHOPPING</a>
+        </div>`;
+        return;
+    }
+
+    ordersContent.innerHTML = `
+    <div class="empty-state">
+        <p>Loading order details...</p>
+    </div>`;
+
+    // Ensure customer is Firebase authenticated (Anonymous Auth)
+    try {
+        await ensureCustomerAuth();
+    } catch (authErr) {
+        console.error('Anonymous authentication error:', authErr);
+    }
+
+    try {
+        const docRef = doc(db, 'orders', orderId);
+        const docSnap = await getDoc(docRef);
+
+        if (!docSnap.exists()) {
+            ordersContent.innerHTML = `
+            <div class="empty-state">
+                <p>Order <span class="order-id">${escapeHtml(orderId)}</span> could not be found.</p>
+                <a href="product.html" class="shop-btn">START SHOPPING</a>
+            </div>`;
+            return;
+        }
+
+        const data = docSnap.data();
+        const createdDate = formatTimestamp(data.createdAt);
+        const products = Array.isArray(data.products) ? data.products : [];
+
+        let productsHtml = '';
+        products.forEach(p => {
+            const price = getItemPrice(p);
+            const sizeText = p.selectedSize ? ` | Size: ${escapeHtml(p.selectedSize)}` : '';
+            const qtyText = `Qty: ${p.qty || 1}`;
+            productsHtml += `
+            <div class="order-product-item">
+                <img src="${p.image || ''}" alt="${escapeHtml(p.name || '')}" onerror="this.src='https://via.placeholder.com/60x72'">
+                <div class="order-product-info">
+                    <div class="order-product-name">${escapeHtml(p.name || 'Product')}</div>
+                    <div class="order-product-meta">${escapeHtml(p.category || '')} ${sizeText} • ${qtyText}</div>
+                </div>
+                <div class="order-product-price">₹${price * (p.qty || 1)}</div>
+            </div>`;
+        });
+
+        const emailSentParam = params.get('emailSent');
+        let emailNoticeHtml = '';
+        if (emailSentParam === 'true') {
+            emailNoticeHtml = `<p style="font-size:12px; color:#137333; margin-top:8px; font-weight:500;">✓ An automatic email with order details has been sent to the store admin.</p>`;
+        } else if (emailSentParam === 'false') {
+            emailNoticeHtml = `<p style="font-size:12px; color:#9B1C1C; margin-top:8px; font-weight:500;">⚠️ Order saved in database. (Note: Email notification to store admin could not be sent).</p>`;
+        }
+
+        ordersContent.innerHTML = `
+        <div class="order-container">
+            <div class="order-success">
+                <div class="success-icon">✓</div>
+                <h3>Order Placed Successfully!</h3>
+                <p>Your Order ID is <span class="order-id">${escapeHtml(data.orderId || orderId)}</span>. We will reach out to you shortly.</p>
+                ${emailNoticeHtml}
+          </div>
+<div class="order-details-card">
+                <div class="order-section-title">
+                    <span>Order Summary</span>
+                    <span class="order-status-badge">${escapeHtml(data.status || 'Pending')}</span>
+                </div>
+
+                <div class="order-info-grid">
+                    <div>
+                        <div class="order-info-label">Customer Name</div>
+                        <div class="order-info-value">${escapeHtml(data.customerName || 'N/A')}</div>
+                    </div>
+                    <div>
+                        <div class="order-info-label">Phone Number</div>
+                        <div class="order-info-value">${escapeHtml(data.customerPhone || 'N/A')}</div>
+                    </div>
+                    <div>
+                        <div class="order-info-label">Email Address</div>
+                        <div class="order-info-value">${escapeHtml(data.customerEmail || 'N/A')}</div>
+                    </div>
+                    <div>
+                        <div class="order-info-label">Delivery Pincode</div>
+                        <div class="order-info-value">${escapeHtml(data.pincode || 'N/A')}</div>
+                    </div>
+                    <div style="grid-column: 1 / -1;">
+                        <div class="order-info-label">Delivery Address</div>
+                        <div class="order-info-value">${escapeHtml(data.customerAddress || 'N/A')}</div>
+                    </div>
+                    ${createdDate ? `
+                    <div style="grid-column: 1 / -1;">
+                        <div class="order-info-label">Order Date</div>
+                        <div class="order-info-value">${createdDate}</div>
+                    </div>` : ''}
+                </div>
+
+                <div class="order-section-title">
+                    <span>Ordered Products</span>
+                </div>
+
+                <div class="order-products-list">
+                    ${productsHtml}
+                </div>
+
+                <div class="order-summary-row">
+                    <span>Total Amount</span>
+                    <span class="total-price">₹${data.totalAmount || 0}</span>
+                </div>
+            </div>
+        </div>`;
+
+
+    } catch (err) {
+        console.error('Failed to load order from Firestore:', err);
+        let errorMsg = 'Could not load order details.';
+        if (err.code === 'permission-denied' || (err.message && err.message.toLowerCase().includes('permission'))) {
+            errorMsg = 'Permission denied: You do not have authorization to view this order.';
+        }
+        ordersContent.innerHTML = `
+        <div class="empty-state">
+            <p>${errorMsg}</p>
+            <a href="product.html" class="shop-btn">RETURN TO SHOP</a>
+        </div>`;
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    renderOrders();
+});
+</script>
+</body>
+</html>

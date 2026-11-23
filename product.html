@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Indiani Way - Products</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<script type="importmap">
+{
+  "imports": {
+    "firebase/app": "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js",
+    "firebase/auth": "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js",
+    "firebase/firestore": "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js"
+  }
+}
+</script>
+<style>
+:root{
+    --bg-main: #FDF6F0;
+    --bg-card: #F9F0EA;
+    --text-dark: #3D2116;
+    --text-light: #8B6A5A;
+    --white: #FFFBF7;
+    --brown-dark: #3D1F10;
+    --red-accent: #9B1C1C;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{width:100%; overflow-x:hidden;}
+body{font-family:'Inter', sans-serif;background:var(--bg-main);color:var(--text-dark);}
+
+.navbar{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:18px 5%; background:var(--white);
+    border-bottom:1px solid #EAE0D8;
+    position:sticky; top:0; z-index:100;
+    width:100%;
+}
+.logo{font-family:'Cormorant Garamond', serif;letter-spacing:3px;font-size:clamp(16px, 2vw, 19px);font-weight:500;cursor:pointer;}
+.nav-links{display:flex;gap:24px;list-style:none;font-size:11px;letter-spacing:2px; align-items:center;}
+.nav-links a{text-decoration:none;color:var(--text-dark);font-weight:500; position:relative; padding-bottom:3px;}
+.nav-links a.active::after, .nav-links a:hover::after{content:''; position:absolute; left:0; bottom:0; width:100%; height:1.5px; background:var(--red-accent);}
+.enquiry-count{ background:var(--red-accent); color:#fff; font-size:9px; padding:2px 6px; border-radius:10px; margin-left:4px; }
+
+.featured-header{padding:30px 5% 15px; width:100%; display:flex; justify-content:space-between; align-items:end;}
+.main-heading{font-family:'Cormorant Garamond', serif; font-size: clamp(32px, 5vw, 52px); font-weight:400;}
+.categories{font-size:11px; letter-spacing:2px; opacity:0.6; text-transform:uppercase;}
+
+.filter-section{
+    padding:12px 5%; display:flex; gap:8px;
+    border-bottom:1px solid #EAE0D8; border-top:1px solid #EAE0D8;
+    background:var(--bg-main); position:sticky; top:58px; z-index:90;
+    overflow-x:auto; white-space:nowrap; scrollbar-width:none;
+    width:100%;
+}
+.filter-section::-webkit-scrollbar{display:none;}
+.filter-btn{
+    flex-shrink:0; padding:7px 16px; border:1px solid var(--text-dark);
+    background:transparent; font-size:10px; letter-spacing:1.5px;
+    text-transform:uppercase; cursor:pointer; transition:0.2s;
+}
+.filter-btn.active, .filter-btn:hover{background:var(--text-dark);color:var(--white);}
+
+.product-grid{
+    display:grid;
+    width:100%;
+    padding:20px 5%;
+    gap:clamp(10px, 2vw, 20px);
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+}
+.product-empty{ padding: 60px 5%; text-align:center; font-family:'Cormorant Garamond', serif; font-size: 20px; opacity: .6; }
+
+.product-card{background:var(--white);border:1px solid #EAE0D8; width:100%; transition:0.3s;}
+.product-card:hover{transform:translateY(-5px); box-shadow:0 10px 30px rgba(61,31,16,0.08);}
+.image-wrap{background:var(--bg-card);position:relative;aspect-ratio:1/1.15;overflow:hidden;width:100%;}
+.image-wrap img{width:100%;height:100%;object-fit:cover;display:block;}
+.wishlist-btn{
+    position:absolute;top:8px;right:8px;width:30px;height:30px;border-radius:50%;
+    background:#fff;border:none;display:grid;place-items:center;cursor:pointer;font-size:16px;
+    box-shadow:0 2px 8px rgba(0,0,0,0.1); transition:0.2s; z-index:2;
+}
+.wishlist-btn.wished{background:var(--red-accent); color:#fff;}
+.product-info{padding:12px 10px;}
+.product-category{font-size:8px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-light);margin-bottom:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+.product-name{font-family:'Cormorant Garamond', serif;font-size:clamp(14px, 2.5vw, 17px);margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.product-desc{ font-size:11px; color:var(--text-light); line-height:1.4; margin-bottom:8px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+.product-price{font-size:12px;font-weight:600;margin-bottom:10px;}
+.product-price .strike{ text-decoration:line-through; opacity:.5; font-weight:400; margin-left:4px; }
+.product-sizes { font-size: 10px; letter-spacing: 1px; color: var(--text-light); text-transform: uppercase; margin-bottom: 8px;}
+.cart-btn{width:100%;padding:8px;border:1px solid var(--text-dark);background:var(--text-dark);color:#fff;font-size:9px;letter-spacing:1.2px;cursor:pointer; transition:0.2s;}
+.cart-btn:hover{background:transparent;color:var(--text-dark);}
+
+@media (max-width: 600px){
+    .product-grid{grid-template-columns: repeat(2, 1fr); padding:12px 3%; gap:10px;}
+    .navbar{padding:14px 4%;}
+    .featured-header{padding:20px 4% 10px;}
+    .filter-section{padding:10px 4%; top:50px;}
+}
+@media (min-width: 601px) and (max-width: 900px){
+    .product-grid{grid-template-columns: repeat(3, 1fr); padding:18px 4%;}
+}
+@media (min-width: 901px) and (max-width: 1300px){
+    .product-grid{grid-template-columns: repeat(4, 1fr);}
+}
+@media (min-width: 1301px){
+    .product-grid{grid-template-columns: repeat(5, 1fr); padding:25px 5%;}
+}
+
+/* PRODUCT DETAILS PAGE */
+.product-card{cursor:pointer;}
+.detail-wrap{max-width:560px; margin:0 auto; padding:20px 5% 50px;}
+.detail-back{display:inline-block; font-size:11px; letter-spacing:2px; color:var(--text-dark); background:none; border:none; cursor:pointer; margin-bottom:16px; text-transform:uppercase;}
+.detail-back:hover{color:var(--red-accent);}
+.detail-main{width:100%; aspect-ratio:1/1.15; background:var(--bg-card); border:1px solid #EAE0D8; overflow:hidden;}
+.detail-main img{width:100%; height:100%; object-fit:cover; display:block;}
+.detail-thumbs{display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-top:10px;}
+.detail-thumb{aspect-ratio:1/1; background:var(--bg-card); border:1px solid #EAE0D8; overflow:hidden; cursor:pointer; padding:0; transition:0.2s;}
+.detail-thumb img{width:100%; height:100%; object-fit:cover; display:block;}
+.detail-thumb.active, .detail-thumb:hover{border-color:var(--red-accent);}
+.detail-category{font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--text-light); margin-top:20px;}
+.detail-name{font-family:'Cormorant Garamond', serif; font-size:clamp(24px,5vw,32px); font-weight:500; margin:4px 0 0;}
+.detail-price{font-size:20px; font-weight:600; margin-top:16px;}
+.detail-price .strike{text-decoration:line-through; opacity:.5; font-weight:400; font-size:14px; margin-left:8px;}
+.detail-sizes{font-size:11px; letter-spacing:1px; color:var(--text-light); text-transform:uppercase; margin-top:8px;}
+.detail-desc{font-size:14px; line-height:1.7; color:var(--text-light); margin-top:16px;}
+.detail-actions{display:flex; gap:12px; margin-top:24px;}
+.detail-actions .cart-btn{padding:14px; font-size:11px; flex:1;}
+.detail-actions .buy-btn{background:var(--red-accent); border-color:var(--red-accent);}
+.detail-actions .buy-btn:hover{background:transparent; color:var(--red-accent);}
+@media (min-width: 901px){ .detail-wrap{padding-top:30px;} }
+</style>
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="logo" onclick="window.location.href='index.html'" title="Go to Home">THE INDIANI WAY</div>
+    <ul class="nav-links">
+        <li><a href="index.html">HOME</a></li>
+        <li><a href="product.html" class="active">PRODUCTS</a></li>
+        <li><a href="cart.html" id="cart">CART <span id="cartCount" class="enquiry-count" style="display:none">0</span></a></li>
+        <li><a href="orders.html" id="yourOrdersLink">PLACED ORDERS</a></li>
+    </ul>
+</nav>
+
+<div id="productDetail" style="display:none;"></div>
+
+<div id="mainShop">
+    <div class="featured-header">
+        <div>
+            <h1 class="main-heading">Our Products</h1>
+            <p class="categories">Categories • Handcrafted in India</p>
+        </div>
+    </div>
+
+    <div class="filter-section">
+        <button class="filter-btn active" data-filter="all">All</button>
+        <button class="filter-btn" data-filter="ethnic wear">Ethnic Wear</button>
+        <button class="filter-btn" data-filter="cord set">Cord Set</button>
+        <button class="filter-btn" data-filter="shirt">Shirt</button>
+        <button class="filter-btn" data-filter="kurti">Kurti</button>
+        <button class="filter-btn" data-filter="pants">Pants</button>
+        <button class="filter-btn" data-filter="frocks">Frocks</button>
+        <button class="filter-btn" data-filter="skirts">Skirts</button>
+        <button class="filter-btn" data-filter="jacket">Jacket</button>
+        <button class="filter-btn" data-filter="stoles">Stoles</button>
+    </div>
+
+    <div class="product-grid" id="productGrid"></div>
+    <!-- Enquiry Modal -->
+<div id="enquiryModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:999; align-items:center; justify-content:center; padding:20px;">
+
+  <div style="background:#FFFBF7; padding:25px; width:100%; max-width:450px;">
+
+    <h2 style="margin-bottom:20px;">Send Product Enquiry</h2>
+
+    <form id="enquiryForm">
+
+      <input type="hidden" id="enquiryProductId">
+
+      <p id="enquiryProductName" style="margin-bottom:15px;"></p>
+
+      <input id="enquiryName" type="text" placeholder="Your Name" required style="width:100%;padding:12px;margin-bottom:12px;">
+
+      <input id="enquiryEmail" type="email" placeholder="Your Email" required style="width:100%;padding:12px;margin-bottom:12px;">
+
+      <input id="enquiryPhone" type="tel" placeholder="Phone Number" required style="width:100%;padding:12px;margin-bottom:12px;">
+
+      <textarea id="enquiryMessage" placeholder="Message / Requirements" rows="4" required style="width:100%;padding:12px;margin-bottom:12px;"></textarea>
+
+      <button type="submit" class="cart-btn" id="enquirySubmitBtn">SEND ENQUIRY</button>
+
+      <button type="button" id="closeEnquiryBtn" class="cart-btn" style="margin-top:10px;">CLOSE</button>
+
+      <p id="enquiryStatus" style="margin-top:12px;"></p>
+
+    </form>
+  </div>
+</div>
+</div>
+
+<script type="module">
+import { db } from './firebase-config.js';
+import {
+  collection,
+  getDocs,
+  query,
+  orderBy,
+  addDoc,
+  serverTimestamp
+} from 'firebase/firestore';
+
+/* All products loaded from Cloud Firestore */
+
+let products = [];
+let wishlist = JSON.parse(localStorage.getItem('indiani_wishlist') || '[]');
+let cart = JSON.parse(localStorage.getItem('indiani_cart') || '[]');
+
+const grid = document.getElementById('productGrid');
+
+async function loadAllProducts(){
+    try{
+        const q = query(collection(db, 'products'), orderBy('createdAt', 'desc'));
+        const snapshot = await getDocs(q);
+        products = snapshot.docs.map(docSnap => {
+            const d = docSnap.data();
+            return {
+                id: docSnap.id,
+                _id: docSnap.id,
+                category: d.category || '',
+                name: d.name || '',
+                price: d.price || 0,
+                discountedPrice: d.discountedPrice !== undefined ? d.discountedPrice : null,
+                description: d.description || '',
+                image: d.image || '',
+                images: Array.isArray(d.images) ? d.images : (Array.isArray(d.gallery) ? d.gallery : []),
+                isFeatured: d.isFeatured === true || d.featured === true,
+                sizes: Array.isArray(d.sizes) ? d.sizes : []
+            };
+        });
+        renderProducts(products);
+        openFromUrl();
+    }catch(err){
+        grid.innerHTML = '<p class="product-empty">Products load Issue, Try After Some time.</p>';
+        console.error('Failed to load products from Firestore:', err);
+        
+    }
+}
+
+function renderProducts(list){
+    if(!list.length){
+        grid.innerHTML = '<p class="product-empty">No Product Found.</p>';
+        return;
+    }
+    grid.innerHTML = "";
+    list.forEach(p => {
+        const isWished = wishlist.includes(p.id);
+        const displayPrice = p.discountedPrice ? p.discountedPrice : p.price;
+        grid.innerHTML += `
+        <div class="product-card">
+            <div class="image-wrap">
+                <img src="${p.image}" alt="${p.name}" onerror="this.src='https://via.placeholder.com/300x400?text=${encodeURIComponent(p.name)}'">
+                <button class="wishlist-btn ${isWished ? 'wished' : ''}" data-id="${p.id}" aria-label="Add to wishlist">${isWished ? '♥' : '♡'}</button>
+            </div>
+            <div class="product-info">
+                <p class="product-category">${p.category}</p>
+                <h3 class="product-name">${p.name}</h3>
+                ${p.description ? `<p class="product-desc">${p.description}</p>` : ''}
+                <p class="product-price">INR ₹${displayPrice}${p.discountedPrice ? `<span class="strike">₹${p.price}</span>` : ''}</p>
+                ${p.sizes && p.sizes.length ? `<p class="product-sizes">Sizes: ${p.sizes.join(' / ')}</p>` : ''}
+                <button class="cart-btn" data-id="${p.id}">ADD TO CART</button>
+                <button class="cart-btn enquiry-btn" data-id="${p.id}" style="margin-top:8px;">SEND ENQUIRY</button>
+            </div>
+        </div>`;
+    });
+    attachCardEvents();
+}
+
+const mainShop = document.getElementById('mainShop');
+const detailBox = document.getElementById('productDetail');
+
+function esc(t){ return String(t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+function showDetail(id, push=true){
+    const p = products.find(pr => pr.id === id);
+    if(!p) return;
+    // 4 slider images: use extra images if available, otherwise fill with the main image
+    const gallery = p.images.filter(Boolean);
+    const slides = [];
+    for(let i=0;i<4;i++) slides.push(gallery[i] || p.image);
+    const displayPrice = p.discountedPrice ? p.discountedPrice : p.price;
+    const fallback = 'https://via.placeholder.com/300x400?text=' + encodeURIComponent(p.name);
+
+    detailBox.innerHTML = `
+    <div class="detail-wrap">
+        <button type="button" class="detail-back" id="detailBack">&larr; Back to Products</button>
+        <div class="detail-main"><img id="detailMainImg" src="${esc(p.image)}" alt="${esc(p.name)}" onerror="this.src='${fallback}'"></div>
+        <div class="detail-thumbs">
+            ${slides.map((src,i)=>`<button type="button" class="detail-thumb" data-src="${esc(src)}"><img src="${esc(src)}" alt="${esc(p.name)} ${i+1}" onerror="this.src='${fallback}'"></button>`).join('')}
+        </div>
+        <p class="detail-category">${esc(p.category)}</p>
+        <h1 class="detail-name">${esc(p.name)}</h1>
+        <p class="detail-price">INR ₹${displayPrice}${p.discountedPrice ? `<span class="strike">₹${p.price}</span>` : ''}</p>
+        ${p.sizes && p.sizes.length ? `<p class="detail-sizes">Sizes: ${p.sizes.map(esc).join(' / ')}</p>` : ''}
+        ${p.description ? `<p class="detail-desc">${esc(p.description)}</p>` : ''}
+        <div class="detail-actions">
+            <button type="button" class="cart-btn" id="detailAddCart">ADD TO CART</button>
+            <button type="button" class="cart-btn buy-btn" id="detailBuyNow">BUY NOW</button>
+        </div>
+    </div>`;
+
+    mainShop.style.display = 'none';
+    detailBox.style.display = 'block';
+    window.scrollTo(0,0);
+    if(push) history.pushState({id}, '', '?id=' + encodeURIComponent(id));
+
+    detailBox.querySelectorAll('.detail-thumb').forEach(t => t.addEventListener('click', () => {
+        document.getElementById('detailMainImg').src = t.dataset.src;
+        detailBox.querySelectorAll('.detail-thumb').forEach(x => x.classList.remove('active'));
+        t.classList.add('active');
+    }));
+    document.getElementById('detailBack').addEventListener('click', () => {
+        if(history.state && history.state.id) history.back(); else showList();
+    });
+    document.getElementById('detailAddCart').addEventListener('click', () => {
+        addToCart(p.id);
+        alert('Added to cart');
+    });
+    document.getElementById('detailBuyNow').addEventListener('click', () => {
+        addToCart(p.id);
+        window.location.href = 'cart.html';
+    });
+}
+
+function showList(){
+    detailBox.style.display = 'none';
+    detailBox.innerHTML = '';
+    mainShop.style.display = 'block';
+    history.replaceState({}, '', 'product.html');
+}
+
+function addToCart(id){
+    const prod = products.find(pr => pr.id === id);
+    if(!prod) return;
+    cart = JSON.parse(localStorage.getItem('indiani_cart') || '[]');
+    const existing = cart.find(c => c.id === id);
+    if(existing){ existing.qty += 1; } else { cart.push({...prod, qty: 1}); }
+    localStorage.setItem('indiani_cart', JSON.stringify(cart));
+    updateCartCount();
+}
+
+function openFromUrl(){
+    const id = new URLSearchParams(location.search).get('id');
+    if(id) showDetail(id, false);
+}
+
+window.addEventListener('popstate', () => {
+    const id = new URLSearchParams(location.search).get('id');
+    if(id) showDetail(id, false);
+    else { detailBox.style.display='none'; detailBox.innerHTML=''; mainShop.style.display='block'; }
+});
+
+// open details when a product card is clicked (buttons keep their own action)
+grid.addEventListener('click', (e) => {
+    if(e.target.closest('button')) return;
+    const card = e.target.closest('.product-card');
+    if(!card) return;
+    const id = card.querySelector('.cart-btn').getAttribute('data-id');
+    showDetail(id);
+});
+
+function attachCardEvents(){
+
+    // WISHLIST
+    document.querySelectorAll('.wishlist-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const id = btn.getAttribute('data-id');
+            const isWished = btn.classList.toggle('wished');
+
+            if(isWished){
+                wishlist.push(id);
+                btn.textContent = '♥';
+            } else {
+                wishlist = wishlist.filter(i => i !== id);
+                btn.textContent = '♡';
+            }
+
+            localStorage.setItem('indiani_wishlist', JSON.stringify(wishlist));
+        });
+    });
+
+    // ADD TO CART
+    document.querySelectorAll('.cart-btn:not(.enquiry-btn)').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const id = btn.getAttribute('data-id');
+            const prod = products.find(pr => pr.id === id);
+            const existing = cart.find(c => c.id === id);
+
+            if(existing){
+                existing.qty += 1;
+            } else {
+                cart.push({...prod, qty: 1});
+            }
+
+            localStorage.setItem('indiani_cart', JSON.stringify(cart));
+            updateCartCount();
+            alert('Added to cart');
+        });
+    });
+
+    // SEND ENQUIRY
+    document.querySelectorAll('.enquiry-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const id = btn.getAttribute('data-id');
+            const product = products.find(p => p.id === id);
+
+            if(!product) return;
+
+            document.getElementById('enquiryProductId').value = product.id;
+            document.getElementById('enquiryProductName').textContent =
+                'Product: ' + product.name;
+
+            document.getElementById('enquiryModal').style.display = 'flex';
+        });
+    });
+}
+
+// CLOSE ENQUIRY FORM
+document.getElementById("closeEnquiryBtn").addEventListener("click", () => {
+    document.getElementById("enquiryModal").style.display = "none";
+});
+
+// SAVE ENQUIRY TO FIRESTORE
+document.getElementById("enquiryForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const submitBtn = document.getElementById("enquirySubmitBtn");
+    const status = document.getElementById("enquiryStatus");
+
+    const productId = document.getElementById("enquiryProductId").value;
+    const product = products.find(p => p.id === productId);
+
+    if (!product) {
+        status.textContent = "Product not found.";
+        return;
+    }
+
+    const enquiry = {
+        productId: product.id,
+        productName: product.name,
+        customerName: document.getElementById("enquiryName").value.trim(),
+        customerEmail: document.getElementById("enquiryEmail").value.trim(),
+        customerPhone: document.getElementById("enquiryPhone").value.trim(),
+        message: document.getElementById("enquiryMessage").value.trim(),
+        status: "New",
+        createdAt: serverTimestamp()
+    };
+
+    if (!enquiry.customerName || !enquiry.customerEmail ||
+        !enquiry.customerPhone || !enquiry.message) {
+        status.textContent = "Please fill all fields.";
+        return;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = "SENDING...";
+
+    try {
+        await addDoc(collection(db, "enquiries"), enquiry);
+
+        status.textContent = "Enquiry sent successfully!";
+        document.getElementById("enquiryForm").reset();
+
+        setTimeout(() => {
+            document.getElementById("enquiryModal").style.display = "none";
+            status.textContent = "";
+        }, 1500);
+
+    } catch (error) {
+        console.error("Enquiry Error:", error);
+        status.textContent = "Enquiry failed: " + error.message;
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "SEND ENQUIRY";
+    }
+});
+
+function updateCartCount(){
+    const countEl = document.getElementById('cartCount');
+    if(!countEl) return;
+    const totalQty = cart.reduce((s,i)=>s+i.qty,0);
+    if(totalQty > 0){ countEl.style.display='inline-block'; countEl.textContent=totalQty; }
+    else { countEl.style.display='none'; }
+}
+
+document.querySelectorAll('.filter-btn').forEach(btn=>{
+    btn.addEventListener('click', function(){
+        document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+        this.classList.add('active');
+        const f = this.getAttribute('data-filter');
+        if(f==='all') renderProducts(products); else renderProducts(products.filter(p=>p.category===f));
+    });
+});
+
+loadAllProducts();
+updateCartCount();
+</script>
+</body>
+</html>
